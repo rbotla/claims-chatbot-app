@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
 import React from 'react';
 import {
   SafeAreaView,
@@ -16,31 +8,12 @@ import {
   StatusBar,
 } from 'react-native';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
 import { GiftedChat } from 'react-native-gifted-chat'
 import axios from 'axios'
 
 class App extends React.Component {
   state = {
-    messages: [],
-    count: 1
-  }
-  constructor(props) {
-    super(props);
-    this.renderButtons = this.renderButtons.bind(this);
-    this.renderText = this.renderText.bind(this);
-  }
-  
-  componentDidMount() {
-    this.setState({
-      messages: [
+    messages: [
         {
           _id: 1,
           text: 'Hello',
@@ -51,8 +24,12 @@ class App extends React.Component {
             avatar: 'https://cdn3.iconfinder.com/data/icons/artificial-intelligence-solid/57/056_-_Medical_Bot-512.png',
           },
         },
-      ],
-    })
+      ]
+  }
+  constructor(props) {
+    super(props);
+    this.renderButtons = this.renderButtons.bind(this);
+    this.renderText = this.renderText.bind(this);
   }
 
   onQuickReply(quickReply) {
@@ -95,7 +72,7 @@ class App extends React.Component {
       const resp = JSON.parse(response.request['_response']);
       const textMsgs = that.renderText(resp);
       const btnMsgs = that.renderButtons(resp);
-      const allMessages = [btnMsgs, ...textMsgs];
+      const allMessages = (Object.keys(btnMsgs).length === 0 && btnMsgs.constructor === Object) ? textMsgs : [btnMsgs, ...textMsgs];
 
       that.setState(previousState => {
         console.log(previousState)
