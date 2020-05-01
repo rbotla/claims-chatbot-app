@@ -30,13 +30,14 @@ import axios from 'axios'
 class App extends React.Component {
   state = {
     messages: [],
+    count: 1
   }
   constructor(props) {
     super(props);
     this.renderButtons = this.renderButtons.bind(this);
     this.renderText = this.renderText.bind(this);
   }
-
+  
   componentDidMount() {
     this.setState({
       messages: [
@@ -53,6 +54,7 @@ class App extends React.Component {
       ],
     })
   }
+
   onQuickReply(quickReply) {
     console.log('quick reply: ', quickReply, ' content type: ', quickReply.contentType);
     if(quickReply.contentType === "text") {
@@ -65,34 +67,36 @@ class App extends React.Component {
       this.onSend(
         [
           {
-            _id: new Date().getUTCMilliseconds() + Math.floor(Math.random() * 100),
+            _id: new Date().getUTCMilliseconds() + Math.floor(Math.random() * 100000),
+            key: new Date().getUTCMilliseconds() + Math.floor(Math.random() * 100000),
             text: quickReply[0].title,
+            payload: quickReply[0].value,
             createdAt: new Date(),
             "user": {"_id": 1}
           }
         ]
-      )
+      , true)
     }
     // infinite possibilities 
  } 
-  onSend(messages = []) {
+
+  onSend(messages = [], isButtonClick = false) {
     const that = this;
     console.log('onSend enter: ', messages);
+
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
     }))
-
+//console.log(">>>>> ", messages[0].payload, " -------- \n", messages[0].text);
     axios.post('https://demobot.hexia.org:5005/webhooks/rest/webhook', {
-      message: messages[0].text
+      message: isButtonClick ? messages[0].payload : messages[0].text
     })
     .then(function (response) {
       const resp = JSON.parse(response.request['_response']);
-      console.log('>>>>> ', JSON.stringify(resp))
       const textMsgs = that.renderText(resp);
       const btnMsgs = that.renderButtons(resp);
       const allMessages = [btnMsgs, ...textMsgs];
 
-      //console.log(msgs);
       that.setState(previousState => {
         console.log(previousState)
         return ({
@@ -110,7 +114,8 @@ class App extends React.Component {
     const buttonValues = buttons && buttons[0] ? buttons[0].map( b => ({title: b.title, value: b.payload}) ) : [];
     const btnMsgs = (buttonValues.length > 0) ?
       {
-        _id: new Date().getUTCMilliseconds() + Math.floor(Math.random() * 100),
+        _id: new Date().getUTCMilliseconds() + Math.floor(Math.random() * 100000),
+        key: new Date().getUTCMilliseconds() + Math.floor(Math.random() * 100000),
         createdAt: new Date(),
         quickReplies: {
           type: 'radio', // or 'checkbox',
@@ -122,15 +127,16 @@ class App extends React.Component {
           name: 'React Native',
           avatar: 'https://cdn3.iconfinder.com/data/icons/artificial-intelligence-solid/57/056_-_Medical_Bot-512.png',
         },
-      } : [];
-    console.log('in renderButton: ', btnMsgs);
+      } : {};
+    // console.log('in renderButton: ', btnMsgs);
     return btnMsgs;
   }
 
   renderText(resp) {
     const textList = resp ? resp.map(r => r.text) : [];
     const messages = textList.map(m => ({
-      _id: new Date().getUTCMilliseconds() + Math.floor(Math.random() * 100),
+      _id: new Date().getUTCMilliseconds() + Math.floor(Math.random() * 100000),
+      key: new Date().getUTCMilliseconds() + Math.floor(Math.random() * 100000),
       text: m,
       createdAt: new Date(),
       user: {
