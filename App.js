@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 
 import { GiftedChat } from 'react-native-gifted-chat'
+import QuickReplies from 'react-native-gifted-chat/lib/QuickReplies';
+
 import axios from 'axios'
 
 class App extends React.Component {
@@ -133,6 +135,7 @@ class App extends React.Component {
         messages={this.state.messages}
         onSend={messages => this.onSend(messages)}
         onQuickReply={quickReply => this.onQuickReply(quickReply)}
+        renderQuickReplies={(props) => <QuickReplies {...props} />}
         user={{
           _id: 1,
         }}
